@@ -1,0 +1,86 @@
+name: Deploy SolidaryTech
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to apply Terraform"
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      confirm:
+        description: "Type the environment name to confirm"
+        required: true
+
+jobs:
+
+  #Validação para evitar deploy acidental
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "${{ github.event.inputs.environment }}" ]; then
+            echo "Confirmation '${{ github.event.inputs.confirm }}' does not match environment '${{ github.event.inputs.environment }}'."
+            exit 1
+          fi
+
+  # 1. Aplicar Infra
+  Terraform:
+    needs: validate
+    uses: SolidaryTech-Project/Infrastructure/.github/workflows/terraform_apply.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+
+  # 2. Sincronizar Secrets
+  Secrets:
+    needs: Terraform
+    uses: SolidaryTech-Project/Infrastructure/.github/workflows/secrets.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+
+  # 3. Deploy Observability (Datadog)
+  #Observability:
+  #  needs: Secrets
+  #  uses: SolidaryTech-Project/Observability/.github/workflows/observability.yaml@main
+  #  secrets: inherit
+  #  with:
+  #    environment: ${{ github.event.inputs.environment }}
+
+  # 4. CI dos Microserviços (Rodam em paralelo)
+  CI_NGO:
+    #needs: Observability
+    needs: Secrets
+    uses: SolidaryTech-Project/NGO-Service/.github/workflows/ci.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+
+  CI_Donation:
+    #needs: Observability
+    needs: Secrets
+    uses: SolidaryTech-Project/Donation-Service/.github/workflows/ci.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+
+  CI_Volunteer:
+    #needs: Observability
+    needs: Secrets
+    uses: SolidaryTech-Project/Volunteer-Service/.github/workflows/ci.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+
+  # 5. Deploy Final com ArgoCD e Helm
+  Deploy_Helm:
+    needs: [CI_NGO, CI_Donation, CI_Volunteer] # Espera os CIs terminarem
+    uses: SolidaryTech-Project/SolidaryTech/.github/workflows/cd.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
