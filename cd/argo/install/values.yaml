@@ -1,0 +1,38 @@
+argo-cd:
+  global:
+    domain: ""
+    logging:
+      format: json
+
+  configs:
+    params:
+      server.insecure: true
+      server.rootpath: /argocd
+      server.basehref: /argocd
+
+  server:
+    ingress:
+      enabled: true
+      controller: generic
+      ingressClassName: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+      hostname: ""
+      path: /argocd
+      pathType: Prefix
+
+  dex:
+    enabled: false
+
+  notifications:
+    enabled: false
+
+  applicationSet:
+    enabled: true
+
+  repoServer:
+    replicas: 1
+
+  controller:
+    replicas: 1

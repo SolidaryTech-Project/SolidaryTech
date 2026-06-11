@@ -1,0 +1,27 @@
+project: default
+targetRevision: main
+pathPrefix: ""
+
+destination:
+  server: https://kubernetes.default.svc
+
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+
+services:
+  ngo-service:
+    repoURL: https://github.com/SolidaryTech-Project/NGO-Service
+    path: Helm/ngo-service
+    namespace: ngo-service
+
+  donation-service:
+    repoURL: https://github.com/SolidaryTech-Project/Donation-Service
+    path: Helm/donation-service
+    namespace: donation-service
+
+  volunteer-service:
+    repoURL: https://github.com/SolidaryTech-Project/Volunteer-Service
+    path: Helm/volunteer-service
+    namespace: volunteer-service

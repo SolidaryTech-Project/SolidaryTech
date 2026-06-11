@@ -1,0 +1,74 @@
+name: Deploy CD with ArgoCD
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: string
+
+jobs:
+  Helm-Deploy:
+    name: Helm-Deploy-${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+  
+    env:
+      EKS_CLUSTER_NAME: solidarytech-${{ inputs.environment }}-cluster
+      ARGOCD_NAMESPACE: argocd
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig for EKS
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_REGION }} \
+            --name $EKS_CLUSTER_NAME
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.15.0
+
+      - name: Build Helm dependencies (argocd-install)
+        run: helm dependency update argocd/install
+
+      - name: Deploy ArgoCD (Helm)
+        run: |
+          helm upgrade --install argocd argocd/install \
+            --namespace $ARGOCD_NAMESPACE \
+            --create-namespace \
+            -f argocd/install/values.yaml \
+            -f argocd/install/values-${{ inputs.environment }}.yaml \
+            --wait --timeout 10m
+
+      - name: Wait for argocd-server rollout
+        run: |
+          kubectl -n $ARGOCD_NAMESPACE rollout status deploy/argocd-server --timeout=5m
+
+      - name: Apply ArgoCD Root Application
+        run: kubectl apply -f argocd/bootstrap-${{ inputs.environment }}.yaml
+
+      - name: Verify ArgoCD Applications and Ingress
+        run: |
+          echo "=== Pods ==="
+          kubectl get pods -n $ARGOCD_NAMESPACE
+          echo "=== Applications ==="
+          kubectl get applications -n $ARGOCD_NAMESPACE
+          echo "=== Ingress ==="
+          kubectl get ingress -n $ARGOCD_NAMESPACE -o wide
+          kubectl describe ingress -n $ARGOCD_NAMESPACE argocd-server || true
+          echo "=== NLB hostname ==="
+          kubectl get svc -n ingress-nginx ingress-nginx-controller \
+            -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || true
+          echo ""
