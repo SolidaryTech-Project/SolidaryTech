@@ -48,8 +48,8 @@ jobs:
           helm upgrade --install argocd argocd/install \
             --namespace $ARGOCD_NAMESPACE \
             --create-namespace \
-            -f argocd/install/values.yaml \
-            -f argocd/install/values-${{ inputs.environment }}.yaml \
+            -f cd/argocd/install/values.yaml \
+            -f cd/argocd/install/values-${{ inputs.environment }}.yaml \
             --wait --timeout 10m
 
       - name: Wait for argocd-server rollout
@@ -57,7 +57,7 @@ jobs:
           kubectl -n $ARGOCD_NAMESPACE rollout status deploy/argocd-server --timeout=5m
 
       - name: Apply ArgoCD Root Application
-        run: kubectl apply -f argocd/bootstrap-${{ inputs.environment }}.yaml
+        run: kubectl apply -f cd/argo/bootstrap-${{ inputs.environment }}.yaml
 
       - name: Verify ArgoCD Applications and Ingress
         run: |
