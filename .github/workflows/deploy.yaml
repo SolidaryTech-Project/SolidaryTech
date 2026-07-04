@@ -35,6 +35,8 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ vars.AWS_REGION }}
+      terraform_version: ${{ vars.TF_VERSION }}
 
   # 3. Deploy Observability (Datadog)
   #Observability:
