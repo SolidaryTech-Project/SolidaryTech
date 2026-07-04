@@ -54,6 +54,8 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ vars.AWS_REGION }}
+      python-version: ${{ vars.PYTHON_VERSION }}
 
   CI_Donation:
     #needs: Observability
@@ -62,6 +64,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ vars.AWS_REGION }}
 
   CI_Volunteer:
     #needs: Observability
@@ -70,6 +73,8 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ vars.AWS_REGION }}
+      python-version: ${{ vars.PYTHON_VERSION }}
 
   # 5. Deploy Final com ArgoCD e Helm
   Deploy_Helm:
