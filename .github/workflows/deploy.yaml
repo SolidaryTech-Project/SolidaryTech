@@ -36,14 +36,6 @@ jobs:
     with:
       environment: ${{ github.event.inputs.environment }}
 
-  # 2. Sincronizar Secrets
-  Secrets:
-    needs: Terraform
-    uses: SolidaryTech-Project/Infrastructure/.github/workflows/secrets.yaml@main
-    secrets: inherit
-    with:
-      environment: ${{ github.event.inputs.environment }}
-
   # 3. Deploy Observability (Datadog)
   #Observability:
   #  needs: Secrets
