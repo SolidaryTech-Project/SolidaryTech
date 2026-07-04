@@ -38,7 +38,7 @@ jobs:
 
   # 3. Deploy Observability (Datadog)
   #Observability:
-  #  needs: Secrets
+  #  needs: Terraform
   #  uses: SolidaryTech-Project/Observability/.github/workflows/observability.yaml@main
   #  secrets: inherit
   #  with:
@@ -47,7 +47,7 @@ jobs:
   # 4. CI dos Microserviços (Rodam em paralelo)
   CI_NGO:
     #needs: Observability
-    needs: Secrets
+    needs: Terraform
     uses: SolidaryTech-Project/NGO-Service/.github/workflows/ci.yaml@main
     secrets: inherit
     with:
@@ -55,7 +55,7 @@ jobs:
 
   CI_Donation:
     #needs: Observability
-    needs: Secrets
+    needs: Terraform
     uses: SolidaryTech-Project/Donation-Service/.github/workflows/ci.yaml@main
     secrets: inherit
     with:
@@ -63,7 +63,7 @@ jobs:
 
   CI_Volunteer:
     #needs: Observability
-    needs: Secrets
+    needs: Terraform
     uses: SolidaryTech-Project/Volunteer-Service/.github/workflows/ci.yaml@main
     secrets: inherit
     with:
