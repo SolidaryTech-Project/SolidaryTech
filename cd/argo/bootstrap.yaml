@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/SolidaryTech-Project/solidarytech
     targetRevision: main
-    path: argocd/apps
+    path: cd/argo/apps
     helm:
       valueFiles:
         - values.yaml

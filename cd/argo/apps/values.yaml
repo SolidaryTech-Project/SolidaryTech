@@ -13,15 +13,15 @@ syncPolicy:
 services:
   ngo-service:
     repoURL: https://github.com/SolidaryTech-Project/NGO-Service
-    path: Helm/ngo-service
+    path: Helm
     namespace: ngo-service
 
   donation-service:
     repoURL: https://github.com/SolidaryTech-Project/Donation-Service
-    path: Helm/donation-service
+    path: Helm
     namespace: donation-service
 
   volunteer-service:
     repoURL: https://github.com/SolidaryTech-Project/Volunteer-Service
-    path: Helm/volunteer-service
+    path: Helm
     namespace: volunteer-service
