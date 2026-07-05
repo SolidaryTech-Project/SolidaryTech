@@ -83,3 +83,4 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ vars.AWS_REGION }}
