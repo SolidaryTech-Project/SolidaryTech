@@ -11,6 +11,7 @@ on:
           - development
           - staging
           - production
+          - disaster_recovery
       confirm:
         description: "Type the environment name to confirm"
         required: true
@@ -35,7 +36,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
-      aws-region: ${{ vars.AWS_REGION }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
       terraform_version: ${{ vars.TF_VERSION }}
 
   # 3. Deploy Observability (Datadog)
@@ -54,7 +55,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
-      aws-region: ${{ vars.AWS_REGION }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
       python-version: ${{ vars.PYTHON_VERSION }}
 
   CI_Donation:
@@ -64,7 +65,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
-      aws-region: ${{ vars.AWS_REGION }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
 
   CI_Volunteer:
     #needs: Observability
@@ -73,7 +74,7 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
-      aws-region: ${{ vars.AWS_REGION }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
       python-version: ${{ vars.PYTHON_VERSION }}
 
   # 5. Deploy Final com ArgoCD e Helm
@@ -83,4 +84,4 @@ jobs:
     secrets: inherit
     with:
       environment: ${{ github.event.inputs.environment }}
-      aws-region: ${{ vars.AWS_REGION }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
