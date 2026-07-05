@@ -45,15 +45,15 @@ jobs:
           version: v3.15.0
 
       - name: Build Helm dependencies (argocd-install)
-        run: helm dependency update argocd/install
+        run: helm dependency update cd/argo/install
 
       - name: Deploy ArgoCD (Helm)
         run: |
-          helm upgrade --install argocd argocd/install \
+          helm upgrade --install argocd cd/argo/install \
             --namespace $ARGOCD_NAMESPACE \
             --create-namespace \
-            -f cd/argocd/install/values.yaml \
-            -f cd/argocd/install/values-${{ inputs.environment }}.yaml \
+            -f cd/argo/install/values.yaml \
+            -f cd/argo/install/values-${{ inputs.environment }}.yaml \
             --wait --timeout 10m
 
       - name: Wait for argocd-server rollout
