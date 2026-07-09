@@ -40,12 +40,12 @@ jobs:
       terraform_version: ${{ vars.TF_VERSION }}
 
   # 3. Deploy Observability (Datadog)
-  #Observability:
-  #  needs: Terraform
-  #  uses: SolidaryTech-Project/Observability/.github/workflows/observability.yaml@main
-  #  secrets: inherit
-  #  with:
-  #    environment: ${{ github.event.inputs.environment }}
+  Observability:
+    needs: Terraform
+    uses: SolidaryTech-Project/Observability/.github/workflows/deploy.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
 
   # 4. CI dos Microserviços (Rodam em paralelo)
   CI_NGO:
