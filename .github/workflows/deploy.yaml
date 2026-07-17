@@ -29,9 +29,19 @@ jobs:
             exit 1
           fi
 
+  # 0. Bootstrap Terraform
+  Bootstrap_Terraform:
+    needs: validate
+    uses: SolidaryTech-Project/Infrastructure/.github/workflows/terraform_bootstrap.yaml@main
+    secrets: inherit
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      aws-region: ${{ github.event.inputs.environment == 'disaster_recovery' && vars.AWS_REGION_DR || vars.AWS_REGION }}
+      terraform_version: ${{ vars.TF_VERSION }}
+
   # 1. Aplicar Infra
   Terraform:
-    needs: validate
+    needs: Bootstrap_Terraform
     uses: SolidaryTech-Project/Infrastructure/.github/workflows/terraform_apply.yaml@main
     secrets: inherit
     with:
